@@ -5,7 +5,8 @@ date: "2/14/2020"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+
+```{r setup, include=TRUE}
 knitr::opts_chunk$set(echo = TRUE, message = TRUE)
 
 library(haven)

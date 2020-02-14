@@ -369,7 +369,486 @@ summary {
 </div>
 
 
+<pre class="r"><code>knitr::opts_chunk$set(echo = TRUE, message = TRUE)
 
+library(haven)
+library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ───────────────────────────────────────────────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
+<pre><code>## ✔ ggplot2 3.2.1     ✔ purrr   0.3.2
+## ✔ tibble  2.1.3     ✔ dplyr   0.8.3
+## ✔ tidyr   1.0.0     ✔ stringr 1.4.0
+## ✔ readr   1.3.1     ✔ forcats 0.4.0</code></pre>
+<pre><code>## ── Conflicts ──────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(janitor)</code></pre>
+<pre><code>## 
+## Attaching package: 'janitor'</code></pre>
+<pre><code>## The following objects are masked from 'package:stats':
+## 
+##     chisq.test, fisher.test</code></pre>
+<pre class="r"><code>library(readr)
+library(scales)</code></pre>
+<pre><code>## 
+## Attaching package: 'scales'</code></pre>
+<pre><code>## The following object is masked from 'package:purrr':
+## 
+##     discard</code></pre>
+<pre><code>## The following object is masked from 'package:readr':
+## 
+##     col_factor</code></pre>
+<pre class="r"><code>library(measurements)
+library(tidyverse)
+library(stringr)
+library(gganimate)
+library(readr)
+library(gapminder)
+
+tweetpeso_final = read_dta('tweetpeso-final.dta')
+
+l &lt;- summary(tweetpeso_final)
+
+l</code></pre>
+<pre><code>##       year         month              monthnum           day       
+##  Min.   :2015   Length:806         Min.   : 1.000   Min.   : 1.00  
+##  1st Qu.:2015   Class :character   1st Qu.: 3.000   1st Qu.: 8.00  
+##  Median :2016   Mode  :character   Median : 6.000   Median :16.00  
+##  Mean   :2016                      Mean   : 6.362   Mean   :15.71  
+##  3rd Qu.:2017                      3rd Qu.: 9.000   3rd Qu.:23.00  
+##  Max.   :2018                      Max.   :12.000   Max.   :31.00  
+##                                                                    
+##    ts_nomiss       price_peso    pctchange_peso     pctchange_FRED    
+##  Min.   :  1.0   Min.   :14.48   Min.   :-2.77000   Min.   :-3.05733  
+##  1st Qu.:202.2   1st Qu.:16.66   1st Qu.:-0.50750   1st Qu.:-0.46460  
+##  Median :403.5   Median :18.17   Median : 0.03000   Median :-0.00130  
+##  Mean   :403.5   Mean   :17.86   Mean   : 0.03236   Mean   : 0.03295  
+##  3rd Qu.:604.8   3rd Qu.:18.87   3rd Qu.: 0.54000   3rd Qu.: 0.50403  
+##  Max.   :806.0   Max.   :21.95   Max.   : 8.41000   Max.   : 7.26607  
+##                                                     NA's   :32        
+##      mexico        sentimentsyuzhet_pos sentimentsyuzhet_neg
+##  Min.   :0.00000   Min.   :0.0000       Min.   :0.0000      
+##  1st Qu.:0.00000   1st Qu.:0.0000       1st Qu.:0.0000      
+##  Median :0.00000   Median :0.0000       Median :0.0000      
+##  Mean   :0.08437   Mean   :0.2692       Mean   :0.2357      
+##  3rd Qu.:0.00000   3rd Qu.:0.0000       3rd Qu.:0.0000      
+##  Max.   :4.00000   Max.   :6.0000       Max.   :6.0000      
+##                                                             
+##  tweet_subject_count    tweetdum      tweetdum_3to5    tweetdum_8to12  
+##  Min.   : 0.0000     Min.   :0.0000   Min.   :0.0000   Min.   :0.0000  
+##  1st Qu.: 0.0000     1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:0.0000  
+##  Median : 0.0000     Median :0.0000   Median :0.0000   Median :0.0000  
+##  Mean   : 0.8387     Mean   :0.2965   Mean   :0.2978   Mean   :0.2891  
+##  3rd Qu.: 1.0000     3rd Qu.:1.0000   3rd Qu.:1.0000   3rd Qu.:1.0000  
+##  Max.   :16.0000     Max.   :1.0000   Max.   :1.0000   Max.   :1.0000  
+##                                                                        
+##  tweet_num_bernie  tweet_num_clinton tweet_num_cruz   tweet_num_china  
+##  Min.   :0.00000   Min.   : 0.0000   Min.   : 0.000   Min.   :0.00000  
+##  1st Qu.:0.00000   1st Qu.: 0.0000   1st Qu.: 0.000   1st Qu.:0.00000  
+##  Median :0.00000   Median : 0.0000   Median : 1.000   Median :0.00000  
+##  Mean   :0.07444   Mean   : 0.7792   Mean   : 1.148   Mean   :0.07444  
+##  3rd Qu.:0.00000   3rd Qu.: 1.0000   3rd Qu.: 2.000   3rd Qu.:0.00000  
+##  Max.   :6.00000   Max.   :28.0000   Max.   :10.000   Max.   :3.00000  
+##                                                                        
+##  tweet_num_europe  tweet_dum_bernie  tweet_dum_clinton tweet_dum_cruz  
+##  Min.   :0.00000   Min.   :0.00000   Min.   :0.0000    Min.   :0.0000  
+##  1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.0000    1st Qu.:0.0000  
+##  Median :0.00000   Median :0.00000   Median :0.0000    Median :1.0000  
+##  Mean   :0.01365   Mean   :0.04591   Mean   :0.3176    Mean   :0.5633  
+##  3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:1.0000    3rd Qu.:1.0000  
+##  Max.   :2.00000   Max.   :1.00000   Max.   :1.0000    Max.   :1.0000  
+##                                                                        
+##  tweet_dum_china      BdM_any         USpres2016         USlameduck     
+##  Min.   :0.00000   Min.   :0.0000   Min.   :0.000000   Min.   :0.00000  
+##  1st Qu.:0.00000   1st Qu.:0.0000   1st Qu.:0.000000   1st Qu.:0.00000  
+##  Median :0.00000   Median :0.0000   Median :0.000000   Median :0.00000  
+##  Mean   :0.05831   Mean   :0.3027   Mean   :0.001241   Mean   :0.06576  
+##  3rd Qu.:0.00000   3rd Qu.:1.0000   3rd Qu.:0.000000   3rd Qu.:0.00000  
+##  Max.   :1.00000   Max.   :1.0000   Max.   :1.000000   Max.   :1.00000  
+##                                                                         
+##  trump_presidency trump_candidate  trump_GOPnominee trump_precandidate
+##  Min.   :0.000    Min.   :0.0000   Min.   :0.0000   Min.   :0.0000    
+##  1st Qu.:0.000    1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:0.0000    
+##  Median :0.000    Median :0.0000   Median :0.0000   Median :0.0000    
+##  Mean   :0.335    Mean   :0.3524   Mean   :0.1005   Mean   :0.1464    
+##  3rd Qu.:1.000    3rd Qu.:1.0000   3rd Qu.:0.0000   3rd Qu.:0.0000    
+##  Max.   :1.000    Max.   :1.0000   Max.   :1.0000   Max.   :1.0000    
+##                                                                       
+##  tweetdum_candidate tweetdum_GOPnominee tweetdum_lameduck 
+##  Min.   :0.0000     Min.   :0.00000     Min.   :0.000000  
+##  1st Qu.:0.0000     1st Qu.:0.00000     1st Qu.:0.000000  
+##  Median :0.0000     Median :0.00000     Median :0.000000  
+##  Mean   :0.1253     Mean   :0.02854     Mean   :0.009926  
+##  3rd Qu.:0.0000     3rd Qu.:0.00000     3rd Qu.:0.000000  
+##  Max.   :1.0000     Max.   :1.00000     Max.   :1.000000  
+##                                                           
+##  tweetdum_presidency tweetdum_precandidate  price_sp500  
+##  Min.   :0.00000     Min.   :0.00000       Min.   :1829  
+##  1st Qu.:0.00000     1st Qu.:0.00000       1st Qu.:2069  
+##  Median :0.00000     Median :0.00000       Median :2129  
+##  Mean   :0.09553     Mean   :0.03722       Mean   :2219  
+##  3rd Qu.:0.00000     3rd Qu.:0.00000       3rd Qu.:2385  
+##  Max.   :1.00000     Max.   :1.00000       Max.   :2873  
+##                                            NA's   :1     
+##  pctchangesp500     price_mex_stock pctchange_mex_stock   mexico_dum     
+##  Min.   :-3.94000   Min.   :4445    Min.   :-9.010000   Min.   :0.00000  
+##  1st Qu.:-0.26000   1st Qu.:5245    1st Qu.:-0.727500   1st Qu.:0.00000  
+##  Median : 0.03000   Median :5495    Median : 0.000000   Median :0.00000  
+##  Mean   : 0.04335   Mean   :5523    Mean   : 0.000775   Mean   :0.05955  
+##  3rd Qu.: 0.41000   3rd Qu.:5908    3rd Qu.: 0.767500   3rd Qu.:0.00000  
+##  Max.   : 3.90000   Max.   :6483    Max.   : 5.780000   Max.   :1.00000  
+##  NA's   :1                                                               
+##    trade_dum         nafta_dum          pena_dum          nieto_dum       
+##  Min.   :0.00000   Min.   :0.00000   Min.   :0.000000   Min.   :0.000000  
+##  1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.000000   1st Qu.:0.000000  
+##  Median :0.00000   Median :0.00000   Median :0.000000   Median :0.000000  
+##  Mean   :0.05831   Mean   :0.01365   Mean   :0.003722   Mean   :0.002481  
+##  3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.000000   3rd Qu.:0.000000  
+##  Max.   :1.00000   Max.   :1.00000   Max.   :1.000000   Max.   :1.000000  
+##                                                                           
+##     peso_dum    wall_dum         border_dum    tradedeficit_dum  
+##  Min.   :0   Min.   :0.00000   Min.   :0.000   Min.   :0.000000  
+##  1st Qu.:0   1st Qu.:0.00000   1st Qu.:0.000   1st Qu.:0.000000  
+##  Median :0   Median :0.00000   Median :0.000   Median :0.000000  
+##  Mean   :0   Mean   :0.07816   Mean   :0.129   Mean   :0.009926  
+##  3rd Qu.:0   3rd Qu.:0.00000   3rd Qu.:0.000   3rd Qu.:0.000000  
+##  Max.   :0   Max.   :1.00000   Max.   :1.000   Max.   :1.000000  
+##                                                                  
+##  immigrant_dum      illegal_dum         tpp_dum          latino_dum      
+##  Min.   :0.00000   Min.   :0.00000   Min.   :0.00000   Min.   :0.000000  
+##  1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.000000  
+##  Median :0.00000   Median :0.00000   Median :0.00000   Median :0.000000  
+##  Mean   :0.02854   Mean   :0.08561   Mean   :0.01737   Mean   :0.008685  
+##  3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.000000  
+##  Max.   :1.00000   Max.   :1.00000   Max.   :1.00000   Max.   :1.000000  
+##                                                                          
+##    deport_dum       immigration_dum    hispanic_dum      mexican_dum     
+##  Min.   :0.000000   Min.   :0.00000   Min.   :0.00000   Min.   :0.00000  
+##  1st Qu.:0.000000   1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.00000  
+##  Median :0.000000   Median :0.00000   Median :0.00000   Median :0.00000  
+##  Mean   :0.007444   Mean   :0.08065   Mean   :0.02854   Mean   :0.01985  
+##  3rd Qu.:0.000000   3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.00000  
+##  Max.   :1.000000   Max.   :1.00000   Max.   :1.00000   Max.   :1.00000  
+##                                                                          
+##    lnusdstock    bondspread10yr_pc  lnretweet_count  lnfavorite_count
+##  Min.   :12.05   Min.   :-5.41044   Min.   : 0.000   Min.   : 0.000  
+##  1st Qu.:12.07   1st Qu.:-0.77150   1st Qu.: 0.000   1st Qu.: 0.000  
+##  Median :12.08   Median : 0.06196   Median : 0.000   Median : 0.000  
+##  Mean   :12.10   Mean   : 0.04105   Mean   : 2.439   Mean   : 2.669  
+##  3rd Qu.:12.10   3rd Qu.: 0.81752   3rd Qu.: 6.506   3rd Qu.: 6.505  
+##  Max.   :12.19   Max.   : 8.89382   Max.   :11.356   Max.   :12.243  
+##                  NA's   :1                                           
+##  MexUS_targetratediff trumppred_WTA   NAFTA_roundsandother
+##  Min.   :2.875        Min.   : 1.10   Min.   :0.00000     
+##  1st Qu.:2.875        1st Qu.:31.90   1st Qu.:0.00000     
+##  Median :3.875        Median :39.60   Median :0.00000     
+##  Mean   :4.172        Mean   :37.33   Mean   :0.02357     
+##  3rd Qu.:5.625        3rd Qu.:42.70   3rd Qu.:0.00000     
+##  Max.   :5.875        Max.   :75.00   Max.   :1.00000     
+##                       NA's   :321                         
+##  lnretweet_precandidate lnretweet_candidate lnretweet_GOPnominee
+##  Min.   :0.0000         Min.   : 0.0000     Min.   : 0.0000     
+##  1st Qu.:0.0000         1st Qu.: 0.0000     1st Qu.: 0.0000     
+##  Median :0.0000         Median : 0.0000     Median : 0.0000     
+##  Mean   :0.1635         Mean   : 0.9672     Mean   : 0.2639     
+##  3rd Qu.:0.0000         3rd Qu.: 0.0000     3rd Qu.: 0.0000     
+##  Max.   :7.6478         Max.   :11.3559     Max.   :10.3156     
+##                                                                 
+##  lnretweet_lameduck lnretweet_presidency lnfavorite_precandidate
+##  Min.   : 0.0000    Min.   : 0.0000      Min.   :0.0000         
+##  1st Qu.: 0.0000    1st Qu.: 0.0000      1st Qu.:0.0000         
+##  Median : 0.0000    Median : 0.0000      Median :0.0000         
+##  Mean   : 0.1003    Mean   : 0.9441      Mean   :0.1797         
+##  3rd Qu.: 0.0000    3rd Qu.: 0.0000      3rd Qu.:0.0000         
+##  Max.   :10.8034    Max.   :10.8880      Max.   :7.2027         
+##                                                                 
+##  lnfavorite_candidate lnfavorite_GOPnominee lnfavorite_lameduck
+##  Min.   : 0.000       Min.   : 0.0000       Min.   : 0.0000    
+##  1st Qu.: 0.000       1st Qu.: 0.0000       1st Qu.: 0.0000    
+##  Median : 0.000       Median : 0.0000       Median : 0.0000    
+##  Mean   : 1.039       Mean   : 0.2909       Mean   : 0.1139    
+##  3rd Qu.: 0.000       3rd Qu.: 0.0000       3rd Qu.: 0.0000    
+##  Max.   :11.693       Max.   :11.3045       Max.   :12.0658    
+##                                                                
+##  lnfavorite_presidency tweetdum_3to5_precandidate tweetdum_3to5_candidate
+##  Min.   : 0.000        Min.   :0.00000            Min.   :0.0000         
+##  1st Qu.: 0.000        1st Qu.:0.00000            1st Qu.:0.0000         
+##  Median : 0.000        Median :0.00000            Median :0.0000         
+##  Mean   : 1.046        Mean   :0.03722            Mean   :0.1241         
+##  3rd Qu.: 0.000        3rd Qu.:0.00000            3rd Qu.:0.0000         
+##  Max.   :12.243        Max.   :1.00000            Max.   :1.0000         
+##                                                                          
+##  tweetdum_3to5_GOPnominee tweetdum_3to5_lameduck tweetdum_3to5_presidency
+##  Min.   :0.00000          Min.   :0.000000       Min.   :0.00000         
+##  1st Qu.:0.00000          1st Qu.:0.000000       1st Qu.:0.00000         
+##  Median :0.00000          Median :0.000000       Median :0.00000         
+##  Mean   :0.02854          Mean   :0.009926       Mean   :0.09801         
+##  3rd Qu.:0.00000          3rd Qu.:0.000000       3rd Qu.:0.00000         
+##  Max.   :1.00000          Max.   :1.000000       Max.   :1.00000         
+##                                                                          
+##  tweetdum_8to12_precandidate tweetdum_8to12_candidate
+##  Min.   :0.00000             Min.   :0.0000          
+##  1st Qu.:0.00000             1st Qu.:0.0000          
+##  Median :0.00000             Median :0.0000          
+##  Mean   :0.03598             Mean   :0.1228          
+##  3rd Qu.:0.00000             3rd Qu.:0.0000          
+##  Max.   :1.00000             Max.   :1.0000          
+##                                                      
+##  tweetdum_8to12_GOPnominee tweetdum_8to12_lameduck
+##  Min.   :0.00000           Min.   :0.000000       
+##  1st Qu.:0.00000           1st Qu.:0.000000       
+##  Median :0.00000           Median :0.000000       
+##  Mean   :0.02854           Mean   :0.008685       
+##  3rd Qu.:0.00000           3rd Qu.:0.000000       
+##  Max.   :1.00000           Max.   :1.000000       
+##                                                   
+##  tweetdum_8to12_presidency   tweet_2cat     tweet_2cat_precandidate
+##  Min.   :0.00000           Min.   :0.0000   Min.   :0.00000        
+##  1st Qu.:0.00000           1st Qu.:0.0000   1st Qu.:0.00000        
+##  Median :0.00000           Median :0.0000   Median :0.00000        
+##  Mean   :0.09305           Mean   :0.4144   Mean   :0.05087        
+##  3rd Qu.:0.00000           3rd Qu.:1.0000   3rd Qu.:0.00000        
+##  Max.   :1.00000           Max.   :2.0000   Max.   :2.00000        
+##                                                                    
+##  tweet_2cat_candidate tweet_2cat_GOPnominee tweet_2cat_lameduck
+##  Min.   :0.0000       Min.   :0.00000       Min.   :0.00000    
+##  1st Qu.:0.0000       1st Qu.:0.00000       1st Qu.:0.00000    
+##  Median :0.0000       Median :0.00000       Median :0.00000    
+##  Mean   :0.1861       Mean   :0.03846       Mean   :0.01241    
+##  3rd Qu.:0.0000       3rd Qu.:0.00000       3rd Qu.:0.00000    
+##  Max.   :2.0000       Max.   :2.00000       Max.   :2.00000    
+##                                                                
+##  tweet_2cat_presidency traderelev_dum    immigrantrelev_dum
+##  Min.   :0.0000        Min.   :0.00000   Min.   :0.0000    
+##  1st Qu.:0.0000        1st Qu.:0.00000   1st Qu.:0.0000    
+##  Median :0.0000        Median :0.00000   Median :0.0000    
+##  Mean   :0.1266        Mean   :0.07692   Mean   :0.2407    
+##  3rd Qu.:0.0000        3rd Qu.:0.00000   3rd Qu.:0.0000    
+##  Max.   :2.0000        Max.   :1.00000   Max.   :1.0000    
+##                                                            
+##  traderelev_dum_precandidate traderelev_dum_candidate
+##  Min.   :0.00000             Min.   :0.0000          
+##  1st Qu.:0.00000             1st Qu.:0.0000          
+##  Median :0.00000             Median :0.0000          
+##  Mean   :0.01613             Mean   :0.0335          
+##  3rd Qu.:0.00000             3rd Qu.:0.0000          
+##  Max.   :1.00000             Max.   :1.0000          
+##                                                      
+##  traderelev_dum_GOPnominee traderelev_dum_lameduck
+##  Min.   :0.000000          Min.   :0              
+##  1st Qu.:0.000000          1st Qu.:0              
+##  Median :0.000000          Median :0              
+##  Mean   :0.009926          Mean   :0              
+##  3rd Qu.:0.000000          3rd Qu.:0              
+##  Max.   :1.000000          Max.   :0              
+##                                                   
+##  traderelev_dum_presidency immigrantrelev_dum_precandidate
+##  Min.   :0.00000           Min.   :0.00000                
+##  1st Qu.:0.00000           1st Qu.:0.00000                
+##  Median :0.00000           Median :0.00000                
+##  Mean   :0.01737           Mean   :0.02109                
+##  3rd Qu.:0.00000           3rd Qu.:0.00000                
+##  Max.   :1.00000           Max.   :1.00000                
+##                                                           
+##  immigrantrelev_dum_candidate immigrantrelev_dum_GOPnominee
+##  Min.   :0.0000               Min.   :0.00000              
+##  1st Qu.:0.0000               1st Qu.:0.00000              
+##  Median :0.0000               Median :0.00000              
+##  Mean   :0.1079               Mean   :0.02233              
+##  3rd Qu.:0.0000               3rd Qu.:0.00000              
+##  Max.   :1.0000               Max.   :1.00000              
+##                                                            
+##  immigrantrelev_dum_lameduck immigrantrelev_dum_presidency  tweetdum_WTA  
+##  Min.   :0.000000            Min.   :0.00000               Min.   : 0.00  
+##  1st Qu.:0.000000            1st Qu.:0.00000               1st Qu.: 0.00  
+##  Median :0.000000            Median :0.00000               Median : 0.00  
+##  Mean   :0.006203            Mean   :0.08313               Mean   :11.89  
+##  3rd Qu.:0.000000            3rd Qu.:0.00000               3rd Qu.:31.10  
+##  Max.   :1.000000            Max.   :1.00000               Max.   :48.00  
+##                                                            NA's   :321    
+##  peso_pctchange_low peso_pctchange_high tweet_dum_clinton_precandidate
+##  Min.   :-4.02281   Min.   :-2.90114    Min.   :0.00000               
+##  1st Qu.:-0.38272   1st Qu.:-0.39013    1st Qu.:0.00000               
+##  Median : 0.03361   Median : 0.01226    Median :0.00000               
+##  Mean   : 0.02968   Mean   : 0.03262    Mean   :0.03102               
+##  3rd Qu.: 0.39018   3rd Qu.: 0.40212    3rd Qu.:0.00000               
+##  Max.   : 8.65445   Max.   :11.25987    Max.   :1.00000               
+##  NA's   :1          NA's   :1                                         
+##  tweet_dum_clinton_candidate tweet_dum_clinton_GOPnominee
+##  Min.   :0.0000              Min.   :0.00000             
+##  1st Qu.:0.0000              1st Qu.:0.00000             
+##  Median :0.0000              Median :0.00000             
+##  Mean   :0.1551              Mean   :0.07692             
+##  3rd Qu.:0.0000              3rd Qu.:0.00000             
+##  Max.   :1.0000              Max.   :1.00000             
+##                                                          
+##  tweet_dum_clinton_lameduck tweet_dum_clinton_presidency
+##  Min.   :0.00000            Min.   :0.00000             
+##  1st Qu.:0.00000            1st Qu.:0.00000             
+##  Median :0.00000            Median :0.00000             
+##  Mean   :0.01241            Mean   :0.04218             
+##  3rd Qu.:0.00000            3rd Qu.:0.00000             
+##  Max.   :1.00000            Max.   :1.00000             
+##                                                         
+##  tweet_dum_cruz_precandidate tweet_dum_cruz_candidate
+##  Min.   :0.0000              Min.   :0.0000          
+##  1st Qu.:0.0000              1st Qu.:0.0000          
+##  Median :0.0000              Median :0.0000          
+##  Mean   :0.1005              Mean   :0.2208          
+##  3rd Qu.:0.0000              3rd Qu.:0.0000          
+##  Max.   :1.0000              Max.   :1.0000          
+##                                                      
+##  tweet_dum_cruz_GOPnominee tweet_dum_cruz_lameduck
+##  Min.   :0.00000           Min.   :0.00000        
+##  1st Qu.:0.00000           1st Qu.:0.00000        
+##  Median :0.00000           Median :0.00000        
+##  Mean   :0.04839           Mean   :0.02605        
+##  3rd Qu.:0.00000           3rd Qu.:0.00000        
+##  Max.   :1.00000           Max.   :1.00000        
+##                                                   
+##  tweet_dum_cruz_presidency smtsyuzhet_neg_dum_precandidate
+##  Min.   :0.0000            Min.   :0.00000                
+##  1st Qu.:0.0000            1st Qu.:0.00000                
+##  Median :0.0000            Median :0.00000                
+##  Mean   :0.1675            Mean   :0.01241                
+##  3rd Qu.:0.0000            3rd Qu.:0.00000                
+##  Max.   :1.0000            Max.   :1.00000                
+##                                                           
+##  smtsyuzhet_neg_dum_candidate smtsyuzhet_neg_dum_GOPnominee
+##  Min.   :0.00000              Min.   :0.00000              
+##  1st Qu.:0.00000              1st Qu.:0.00000              
+##  Median :0.00000              Median :0.00000              
+##  Mean   :0.08685              Mean   :0.01861              
+##  3rd Qu.:0.00000              3rd Qu.:0.00000              
+##  Max.   :1.00000              Max.   :1.00000              
+##                                                            
+##  smtsyuzhet_neg_dum_lameduck smtsyuzhet_neg_dum_presidency
+##  Min.   :0.000000            Min.   :0.00000              
+##  1st Qu.:0.000000            1st Qu.:0.00000              
+##  Median :0.000000            Median :0.00000              
+##  Mean   :0.003722            Mean   :0.04342              
+##  3rd Qu.:0.000000            3rd Qu.:0.00000              
+##  Max.   :1.000000            Max.   :1.00000              
+##                                                           
+##  smtsyuzhet_pos_dum_precandidate smtsyuzhet_pos_dum_candidate
+##  Min.   :0.00000                 Min.   :0.00000             
+##  1st Qu.:0.00000                 1st Qu.:0.00000             
+##  Median :0.00000                 Median :0.00000             
+##  Mean   :0.02978                 Mean   :0.06948             
+##  3rd Qu.:0.00000                 3rd Qu.:0.00000             
+##  Max.   :1.00000                 Max.   :1.00000             
+##                                                              
+##  smtsyuzhet_pos_dum_GOPnominee smtsyuzhet_pos_dum_lameduck
+##  Min.   :0.00000               Min.   :0.000000           
+##  1st Qu.:0.00000               1st Qu.:0.000000           
+##  Median :0.00000               Median :0.000000           
+##  Mean   :0.01241               Mean   :0.008685           
+##  3rd Qu.:0.00000               3rd Qu.:0.000000           
+##  Max.   :1.00000               Max.   :1.000000           
+##                                                           
+##  smtsyuzhet_pos_dum_presidency sentimentr_neg_dum_precandidate
+##  Min.   :0.00000               Min.   :0.00000                
+##  1st Qu.:0.00000               1st Qu.:0.00000                
+##  Median :0.00000               Median :0.00000                
+##  Mean   :0.05831               Mean   :0.01613                
+##  3rd Qu.:0.00000               3rd Qu.:0.00000                
+##  Max.   :1.00000               Max.   :1.00000                
+##                                                               
+##  sentimentr_neg_dum_candidate sentimentr_neg_dum_GOPnominee
+##  Min.   :0.00000              Min.   :0.00000              
+##  1st Qu.:0.00000              1st Qu.:0.00000              
+##  Median :0.00000              Median :0.00000              
+##  Mean   :0.08437              Mean   :0.01861              
+##  3rd Qu.:0.00000              3rd Qu.:0.00000              
+##  Max.   :1.00000              Max.   :1.00000              
+##                                                            
+##  sentimentr_neg_dum_lameduck sentimentr_neg_dum_presidency
+##  Min.   :0.000000            Min.   :0.00000              
+##  1st Qu.:0.000000            1st Qu.:0.00000              
+##  Median :0.000000            Median :0.00000              
+##  Mean   :0.003722            Mean   :0.04715              
+##  3rd Qu.:0.000000            3rd Qu.:0.00000              
+##  Max.   :1.000000            Max.   :1.00000              
+##                                                           
+##  sentimentr_pos_dum_precandidate sentimentr_pos_dum_candidate
+##  Min.   :0.00000                 Min.   :0.00000             
+##  1st Qu.:0.00000                 1st Qu.:0.00000             
+##  Median :0.00000                 Median :0.00000             
+##  Mean   :0.02854                 Mean   :0.07072             
+##  3rd Qu.:0.00000                 3rd Qu.:0.00000             
+##  Max.   :1.00000                 Max.   :1.00000             
+##                                                              
+##  sentimentr_pos_dum_GOPnominee sentimentr_pos_dum_lameduck
+##  Min.   :0.00000               Min.   :0.000000           
+##  1st Qu.:0.00000               1st Qu.:0.000000           
+##  Median :0.00000               Median :0.000000           
+##  Mean   :0.01241               Mean   :0.008685           
+##  3rd Qu.:0.00000               3rd Qu.:0.000000           
+##  Max.   :1.00000               Max.   :1.000000           
+##                                                           
+##  sentimentr_pos_dum_presidency smtsyuzhet_negcont_precandidate
+##  Min.   :0.00000               Min.   :0.000000               
+##  1st Qu.:0.00000               1st Qu.:0.000000               
+##  Median :0.00000               Median :0.000000               
+##  Mean   :0.05955               Mean   :0.003267               
+##  3rd Qu.:0.00000               3rd Qu.:0.000000               
+##  Max.   :1.00000               Max.   :1.150000               
+##                                                               
+##  smtsyuzhet_negcont_candidate smtsyuzhet_negcont_GOPnominee
+##  Min.   :0.00000              Min.   :0.00000              
+##  1st Qu.:0.00000              1st Qu.:0.00000              
+##  Median :0.00000              Median :0.00000              
+##  Mean   :0.05075              Mean   :0.01766              
+##  3rd Qu.:0.00000              3rd Qu.:0.00000              
+##  Max.   :2.75000              Max.   :2.55000              
+##                                                            
+##  smtsyuzhet_negcont_lameduck smtsyuzhet_negcont_presidency
+##  Min.   :0.0000000           Min.   :0.0000               
+##  1st Qu.:0.0000000           1st Qu.:0.0000               
+##  Median :0.0000000           Median :0.0000               
+##  Mean   :0.0007754           Mean   :0.0413               
+##  3rd Qu.:0.0000000           3rd Qu.:0.0000               
+##  Max.   :0.5750000           Max.   :3.1250               
+##                                                           
+##  smtsyuzhet_poscont_precandidate smtsyuzhet_poscont_candidate
+##  Min.   :0.00000                 Min.   :0.00000             
+##  1st Qu.:0.00000                 1st Qu.:0.00000             
+##  Median :0.00000                 Median :0.00000             
+##  Mean   :0.01857                 Mean   :0.03751             
+##  3rd Qu.:0.00000                 3rd Qu.:0.00000             
+##  Max.   :2.00000                 Max.   :2.15000             
+##                                                              
+##  smtsyuzhet_poscont_GOPnominee smtsyuzhet_poscont_lameduck
+##  Min.   :0.00000               Min.   :0.000000           
+##  1st Qu.:0.00000               1st Qu.:0.000000           
+##  Median :0.00000               Median :0.000000           
+##  Mean   :0.01116               Mean   :0.008127           
+##  3rd Qu.:0.00000               3rd Qu.:0.000000           
+##  Max.   :2.00000               Max.   :2.400000           
+##                                                           
+##  smtsyuzhet_poscont_presidency sentimentr_poscont_precandidate
+##  Min.   :0.00000               Min.   :0.000000               
+##  1st Qu.:0.00000               1st Qu.:0.000000               
+##  Median :0.00000               Median :0.000000               
+##  Mean   :0.06132               Mean   :0.003864               
+##  3rd Qu.:0.00000               3rd Qu.:0.000000               
+##  Max.   :4.35000               Max.   :0.400000               
+##                                                               
+##  sentimentr_poscont_candidate sentimentr_poscont_GOPnominee
+##  Min.   :0.0000               Min.   :0.000000             
+##  1st Qu.:0.0000               1st Qu.:0.000000             
+##  Median :0.0000               Median :0.000000             
+##  Mean   :0.0105               Mean   :0.002485             
+##  3rd Qu.:0.0000               3rd Qu.:0.000000             
+##  Max.   :0.7500               Max.   :0.611010             
+##                                                            
+##  sentimentr_poscont_lameduck sentimentr_poscont_presidency
+##  Min.   :0.000000            Min.   :0.00000              
+##  1st Qu.:0.000000            1st Qu.:0.00000              
+##  Median :0.000000            Median :0.00000              
+##  Mean   :0.001966            Mean   :0.01248              
+##  3rd Qu.:0.000000            3rd Qu.:0.00000              
+##  Max.   :0.643261            Max.   :0.82463              
+## </code></pre>
 
 
 
