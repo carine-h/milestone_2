@@ -1,0 +1,5 @@
+codebook.pdf (application/pdf) 115500 bytes.
+README.txt (text/plain) 1823 bytes.
+replication-main.do (application/x-stata-syntax) 47497 bytes.
+replication-SI.do (application/x-stata-syntax) 31304 bytes.
+tweetpeso-final.dta (application/x-stata) 270234 bytes.

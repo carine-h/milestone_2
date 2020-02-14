@@ -1,0 +1,30 @@
+---
+title: "milestone 2"
+author: "Carine Hajjar"
+date: "2/14/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = TRUE)
+
+library(haven)
+library(tidyverse)
+library(janitor)
+library(readr)
+library(scales)
+library(measurements)
+library(tidyverse)
+library(stringr)
+library(gganimate)
+library(readr)
+library(gapminder)
+
+tweetpeso_final = read_dta('tweetpeso-final.dta')
+
+l <- summary(tweetpeso_final)
+
+l
+```
+
+
